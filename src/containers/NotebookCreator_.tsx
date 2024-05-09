@@ -11,6 +11,7 @@ import {
   Input,
   Image,
   Box,
+  Grid,
   useDisclosure,
   Modal,
   ModalOverlay,
@@ -22,11 +23,29 @@ import {
   IconButton,
   Container,
 } from "@chakra-ui/react";
+/* cover-fixed */
+import { covers_fixed } from "@/utils";
+/* components */
+import { CoverFixed_ } from "@/components";
 
 interface IconButtonProps_ {
   onOpen: () => void;
 }
 interface NotebookCreatorProps {}
+interface ConverContainerProps {
+  covers_fixed: {
+    cover1: string;
+    cover2: string;
+    cover3: string;
+    cover4: string;
+    cover5: string;
+    cover6: string;
+    cover7: string;
+    cover8: string;
+    cover9: string;
+  };
+  covers: string[];
+}
 
 const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
   const [show, setShow] = useState(false);
@@ -54,38 +73,71 @@ const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
   );
 };
 
-const CoverContainer_: React.FC = () => {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-
-  useEffect(() => {
-    const { ipcRenderer } = window.electron;
-
-    console.log("mivar", ipcRenderer);
-
-    ipcRenderer.send(
-      "get-file-data",
-      "D:\\Personal-projects\\funotes\\public\\cover.png"
-    );
-    ipcRenderer.on("file-data", (event: any, data: any) => {
-      const url = URL.createObjectURL(new Blob([data]));
-      setImageSrc(url);
-    });
-  }, []);
-
+const CoverContainer_: React.FC<ConverContainerProps> = ({
+  covers_fixed,
+  covers,
+}) => {
   return (
-    <Container display="flex">
-      <Box boxSize="xs">{imageSrc != null && <Image src={imageSrc} />}</Box>
-    </Container>
+    <Grid
+      templateColumns="repeat(5, 1fr)"
+      rowGap={10}
+      columnGap={8}
+      maxH={270}
+      sx={{
+        overflowY: "auto",
+        "&::-webkit-scrollbar": { width: "8px" },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "gray",
+          borderRadius: "8px",
+        },
+      }}
+    >
+      {Object.values(covers_fixed).map((cover, index) => (
+        <CoverFixed_ cover_fixed={cover} key={index} />
+        // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
+        //   <Image h={"100%"} src={cover} />
+        // </Box>
+      ))}
+      {covers.map((cover, index) => (
+        <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
+          <Image h={"100%"} src={cover} />
+        </Box>
+      ))}
+    </Grid>
   );
 };
 
 export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
+  const { ipcRenderer } = (window as any).electron;
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [covers, setCovers] = useState<string[]>([]);
+
+  useEffect(() => {
+    loadCovers();
+  }, []);
+
+  const loadCovers = () => {
+    ipcRenderer.send(
+      "get-directory-data",
+      "D:\\Personal-projects\\funotes\\public"
+    );
+
+    ipcRenderer.on(
+      "file-data",
+      (event: any, { file, data }: { file: any; data: any }) => {
+        const url = URL.createObjectURL(new Blob([data]));
+        setCovers((oldCovers) => [...oldCovers, url]);
+      }
+    );
+  };
+
   return (
     <>
       <IconButton_ onOpen={onOpen} />
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
         <ModalOverlay />
 
         <ModalContent className="select-none">
@@ -107,16 +159,11 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
             </Container>
 
             <Container mt={10} p={0} display="flex">
-              <Text
-                w="25%"
-                alignContent="center"
-                fontWeight="bold"
-                textColor="#424242"
-              >
+              <Text w="25%" fontWeight="bold" textColor="#424242">
                 Cover
               </Text>
-              <Container>
-                <CoverContainer_ />
+              <Container p={0}>
+                <CoverContainer_ covers_fixed={covers_fixed} covers={covers} />
               </Container>
             </Container>
           </ModalBody>
