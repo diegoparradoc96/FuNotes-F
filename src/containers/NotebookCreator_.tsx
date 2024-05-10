@@ -45,6 +45,8 @@ interface ConverContainerProps {
     cover9: string;
   };
   covers: string[];
+  toggleCoverFixed: (cover: string) => void;
+  selectedCover: string;
 }
 
 const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
@@ -76,6 +78,8 @@ const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
 const CoverContainer_: React.FC<ConverContainerProps> = ({
   covers_fixed,
   covers,
+  toggleCoverFixed,
+  selectedCover,
 }) => {
   return (
     <Grid
@@ -93,7 +97,12 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
       }}
     >
       {Object.values(covers_fixed).map((cover, index) => (
-        <CoverFixed_ cover_fixed={cover} key={index} />
+        <CoverFixed_
+          cover_fixed={cover}
+          key={index}
+          toggleCoverFixed={toggleCoverFixed}
+          selectedCover={selectedCover}
+        />
         // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
         //   <Image h={"100%"} src={cover} />
         // </Box>
@@ -113,6 +122,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [covers, setCovers] = useState<string[]>([]);
+  const [selectedCover, setSelectedCover] = useState<string>("");
 
   useEffect(() => {
     loadCovers();
@@ -133,6 +143,10 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
     );
   };
 
+  const toggleCoverFixed = (cover: string) => {
+    setSelectedCover(cover);
+  };
+
   return (
     <>
       <IconButton_ onOpen={onOpen} />
@@ -148,22 +162,36 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
           <ModalBody>
             <Container p={0} display="flex">
               <Text
-                w="25%"
+                w="20%"
                 alignContent="center"
                 fontWeight="bold"
                 textColor="#424242"
               >
                 Name
               </Text>
-              <Input w="75%" />
+
+              <Input
+                w="80%"
+                variant="unstyled"
+                background="#eee"
+                px={5}
+                py={2}
+                placeholder="Enter notebook name"
+              />
             </Container>
 
             <Container mt={10} p={0} display="flex">
-              <Text w="25%" fontWeight="bold" textColor="#424242">
+              <Text w="20%" fontWeight="bold" textColor="#424242">
                 Cover
               </Text>
-              <Container p={0}>
-                <CoverContainer_ covers_fixed={covers_fixed} covers={covers} />
+
+              <Container p={0} w="80%">
+                <CoverContainer_
+                  covers_fixed={covers_fixed}
+                  covers={covers}
+                  toggleCoverFixed={toggleCoverFixed}
+                  selectedCover={selectedCover}
+                />
               </Container>
             </Container>
           </ModalBody>
