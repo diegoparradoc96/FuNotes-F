@@ -1,0 +1,10 @@
+{
+  "appId": "com.FuNotes.tuapp",
+  "productName": "FuNotes",
+  "directories": {
+    "output": "dist"
+  },
+  "win": {
+    "target": "nsis"
+  }
+}

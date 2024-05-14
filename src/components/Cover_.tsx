@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
 /* chakra ui */
 import { Image, Box } from "@chakra-ui/react";
 
-interface CoverFixedProps {
-  cover_fixed: string;
+interface CoverProps {
+  cover: string;
   selectedCover: string;
-  toggleCoverFixed: (cover: string) => void;
+  toggleCover: (cover: string) => void;
 }
 
-const CoverFixed_: React.FC<CoverFixedProps> = ({
-  cover_fixed,
-  toggleCoverFixed,
+const Cover_: React.FC<CoverProps> = ({
+  cover,
+  toggleCover,
   selectedCover,
 }) => {
   return (
@@ -25,7 +25,7 @@ const CoverFixed_: React.FC<CoverFixedProps> = ({
       borderRadius={10}
       cursor="pointer"
       onClick={() => {
-        toggleCoverFixed(cover_fixed);
+        toggleCover(cover);
       }}
       display="flex"
       justifyContent="center"
@@ -34,14 +34,13 @@ const CoverFixed_: React.FC<CoverFixedProps> = ({
     >
       <div
         className="absolute mt-1"
-        style={cover_fixed == selectedCover ? { zIndex: 1 } : {}}
+        style={cover == selectedCover ? { zIndex: 1 } : {}}
       >
         <CheckIconWrapper>
           <CheckMark />
         </CheckIconWrapper>
       </div>
-
-      <Image h={"100%"} src={cover_fixed} style={{ zIndex: 0 }} />
+      <Image h={"100%"} src={cover} style={{ zIndex: 0 }} />
     </Box>
   );
 };
@@ -66,4 +65,4 @@ const CheckMark = styled.div`
   transform: rotate(45deg);
 `;
 
-export { CoverFixed_ };
+export { Cover_ };

@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
+/* electron */
+import { ipcRenderer } from "electron";
 /* icons */
 import { MdAdd } from "react-icons/md";
 /* crakra */
 import {
   Button,
+  GridItem,
   Text,
   Input,
   Image,
   Box,
   Grid,
   useDisclosure,
+  Divider,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -26,7 +30,7 @@ import {
 /* cover-fixed */
 import { covers_fixed } from "@/utils";
 /* components */
-import { CoverFixed_ } from "@/components";
+import { CoverFixed_, Cover_ } from "@/components";
 
 interface IconButtonProps_ {
   onOpen: () => void;
@@ -46,6 +50,7 @@ interface ConverContainerProps {
   };
   covers: string[];
   toggleCoverFixed: (cover: string) => void;
+  toggleCover: (cover: string) => void;
   selectedCover: string;
 }
 
@@ -79,45 +84,62 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
   covers_fixed,
   covers,
   toggleCoverFixed,
+  toggleCover,
   selectedCover,
 }) => {
   return (
     <Grid
       templateColumns="repeat(5, 1fr)"
-      rowGap={10}
-      columnGap={8}
+      pb={5}
+      rowGap={7}
+      columnGap={5}
       maxH={270}
       sx={{
         overflowY: "auto",
-        "&::-webkit-scrollbar": { width: "8px" },
+        paddingRight: "30px",
+        "&::-webkit-scrollbar": {
+          width: "8px",
+          height: "8px",
+        },
         "&::-webkit-scrollbar-thumb": {
           backgroundColor: "gray",
           borderRadius: "8px",
         },
       }}
     >
+      {covers.map((cover, index) => (
+        <GridItem key={index} minW={59} minH={77} maxH={77}>
+          <Cover_
+            cover={cover}
+            toggleCover={toggleCover}
+            selectedCover={selectedCover}
+          />
+        </GridItem>
+      ))}
+
       {Object.values(covers_fixed).map((cover, index) => (
-        <CoverFixed_
-          cover_fixed={cover}
-          key={index}
-          toggleCoverFixed={toggleCoverFixed}
-          selectedCover={selectedCover}
-        />
+        <GridItem key={index} minW={59} minH={77}>
+          <CoverFixed_
+            cover_fixed={cover}
+            toggleCoverFixed={toggleCoverFixed}
+            selectedCover={selectedCover}
+          />
+        </GridItem>
         // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
         //   <Image h={"100%"} src={cover} />
         // </Box>
-      ))}
-      {covers.map((cover, index) => (
-        <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
-          <Image h={"100%"} src={cover} />
-        </Box>
       ))}
     </Grid>
   );
 };
 
 export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
-  const { ipcRenderer } = (window as any).electron;
+  let ipcRenderer: any;
+  if (typeof window !== "undefined") {
+    ipcRenderer = (window as any).electron.ipcRenderer;
+  }
+  //const { ipcRenderer } = (window as any).electron;
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -125,6 +147,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const [selectedCover, setSelectedCover] = useState<string>("");
 
   useEffect(() => {
+    setCovers([]);
     loadCovers();
   }, []);
 
@@ -137,7 +160,9 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
     ipcRenderer.on(
       "file-data",
       (event: any, { file, data }: { file: any; data: any }) => {
+        console.log("#################");
         const url = URL.createObjectURL(new Blob([data]));
+
         setCovers((oldCovers) => [...oldCovers, url]);
       }
     );
@@ -147,24 +172,44 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
     setSelectedCover(cover);
   };
 
+  const toggleCover = (cover: string) => {
+    setSelectedCover(cover);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const selectedFile = event.target.files[0];
+      console.log("Archivo seleccionado:", selectedFile);
+      ipcRenderer.send("copy-file", selectedFile.path);
+      loadCovers();
+    }
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <>
       <IconButton_ onOpen={onOpen} />
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
         <ModalOverlay />
 
         <ModalContent className="select-none">
-          <ModalHeader textColor="black" textAlign="center">
-            <Text textColor="#424242">Create New Notebook</Text>
+          <ModalHeader textColor="black" textAlign="center" mt={2}>
+            <Text textColor="#424242" fontSize={16}>
+              Create New Notebook
+            </Text>
           </ModalHeader>
 
-          <ModalBody>
-            <Container p={0} display="flex">
+          <ModalBody p={1}>
+            <Container px={10} display="flex">
               <Text
                 w="20%"
                 alignContent="center"
                 fontWeight="bold"
+                fontSize={14}
                 textColor="#424242"
               >
                 Name
@@ -174,27 +219,47 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
                 w="80%"
                 variant="unstyled"
                 background="#eee"
+                fontSize={14}
                 px={5}
                 py={2}
                 placeholder="Enter notebook name"
               />
             </Container>
 
-            <Container mt={10} p={0} display="flex">
-              <Text w="20%" fontWeight="bold" textColor="#424242">
+            <Container mt={10} pl={10} pr={0} display="flex">
+              <Text w="20%" fontWeight="bold" textColor="#424242" fontSize={14}>
                 Cover
+                <Input
+                  type="file"
+                  ref={fileInputRef}
+                  display="none" // Esto oculta el input, pero sigue siendo accesible
+                  onChange={handleFileSelect}
+                  accept=".jpg,.jpeg,.png,.gif" // Puedes agregar extensiones permitidas
+                />
+                <IconButton
+                  as="label" // Usar el componente IconButton como una etiqueta de HTML
+                  onClick={handleClick}
+                  htmlFor="file-input" // Esto conecta el botón con el input de archivo
+                  aria-label="Add cover"
+                  icon={<MdAdd color="#0C67DF" size={25} />}
+                  variant=""
+                  cursor="pointer"
+                />
               </Text>
 
-              <Container p={0} w="80%">
+              <Container p={0} mt={4} w="80%">
                 <CoverContainer_
                   covers_fixed={covers_fixed}
                   covers={covers}
                   toggleCoverFixed={toggleCoverFixed}
+                  toggleCover={toggleCover}
                   selectedCover={selectedCover}
                 />
               </Container>
             </Container>
           </ModalBody>
+
+          <Divider colorScheme="blackAlpha" />
 
           <ModalFooter>
             <Button
