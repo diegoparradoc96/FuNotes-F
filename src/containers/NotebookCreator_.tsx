@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 
-/* electron */
-import { ipcRenderer } from "electron";
 /* icons */
 import { MdAdd } from "react-icons/md";
 /* crakra */
@@ -11,9 +9,7 @@ import {
   Button,
   GridItem,
   Text,
-  Input,
-  Image,
-  Box,
+  Input,  
   Grid,
   useDisclosure,
   Divider,
@@ -133,12 +129,7 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
   );
 };
 
-export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
-  let ipcRenderer: any;
-  if (typeof window !== "undefined") {
-    ipcRenderer = (window as any).electron.ipcRenderer;
-  }
-  //const { ipcRenderer } = (window as any).electron;
+export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -152,20 +143,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   }, []);
 
   const loadCovers = () => {
-    ipcRenderer.send(
-      "get-directory-data",
-      "D:\\Personal-projects\\funotes\\public"
-    );
-
-    ipcRenderer.on(
-      "file-data",
-      (event: any, { file, data }: { file: any; data: any }) => {
-        console.log("#################");
-        const url = URL.createObjectURL(new Blob([data]));
-
-        setCovers((oldCovers) => [...oldCovers, url]);
-      }
-    );
+    console.log("En desarrollo")    ;
   };
 
   const toggleCoverFixed = (cover: string) => {
@@ -179,8 +157,6 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
-      console.log("Archivo seleccionado:", selectedFile);
-      ipcRenderer.send("copy-file", selectedFile.path);
       loadCovers();
     }
   };

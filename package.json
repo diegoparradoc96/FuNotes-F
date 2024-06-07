@@ -5,16 +5,12 @@
   "main": "index.js",
   "autor": "diegoparradoc96",
   "description": "Electron + Next.js project",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start-electron": "node_modules\\electron\\dist\\electron.exe index .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "lint": "next lint",
-    "newDev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev\" \"node_modules\\electron\\dist\\electron.exe index .\"",
-    "newBuild": "next build && electron-builder"
+    "lint": "next lint"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -22,7 +18,6 @@
     "@emotion/styled": "^11.11.5",
     "@tanstack/react-query": "^5.32.1",
     "axios": "^1.6.8",
-    "electron-serve": "^2.0.0",
     "framer-motion": "^11.1.7",
     "next": "14.2.3",
     "react": "^18",
@@ -35,9 +30,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "concurrently": "^8.2.2",
-    "electron": "^30.0.1",
-    "electron-builder": "^24.13.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
