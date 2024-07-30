@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef } from "react";
 
 /* icons */
 import { MdAdd } from "react-icons/md";
-/* crakra */
+/* chakra */
 import {
   Button,
   GridItem,
   Text,
-  Input,  
+  Input,
   Grid,
   useDisclosure,
   Divider,
@@ -27,6 +27,8 @@ import {
 import { covers_fixed } from "@/utils";
 /* components */
 import { CoverFixed_, Cover_ } from "@/components";
+/* services */
+import { bookCoverQueries } from "../services/api-funotes";
 
 interface IconButtonProps_ {
   onOpen: () => void;
@@ -105,11 +107,7 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
     >
       {covers.map((cover, index) => (
         <GridItem key={index} minW={59} minH={77} maxH={77}>
-          <Cover_
-            cover={cover}
-            toggleCover={toggleCover}
-            selectedCover={selectedCover}
-          />
+          <Cover_ cover={cover} toggleCover={toggleCover} selectedCover={selectedCover} />
         </GridItem>
       ))}
 
@@ -129,21 +127,32 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
   );
 };
 
-export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {  
+export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const [coversFixed, setCoversFixed] = useState<any[]>([]);
   const [covers, setCovers] = useState<string[]>([]);
   const [selectedCover, setSelectedCover] = useState<string>("");
 
   useEffect(() => {
     setCovers([]);
+    loadCoversFixed();
     loadCovers();
   }, []);
 
+  const loadCoversFixed = async () => {
+    try {
+      const coversFixedScope = await bookCoverQueries.getBookCovers();
+      console.log("cubiertas de libros: ", coversFixedScope);
+    } catch (error) {
+      console.error("error en loadCoversFixed front: ", error);
+    }
+  };
+
   const loadCovers = () => {
-    console.log("En desarrollo")    ;
+    console.log("En desarrollo");
   };
 
   const toggleCoverFixed = (cover: string) => {
@@ -181,13 +190,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
 
           <ModalBody p={1}>
             <Container px={10} display="flex">
-              <Text
-                w="20%"
-                alignContent="center"
-                fontWeight="bold"
-                fontSize={14}
-                textColor="#424242"
-              >
+              <Text w="20%" alignContent="center" fontWeight="bold" fontSize={14} textColor="#424242">
                 Name
               </Text>
 
@@ -238,12 +241,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
           <Divider colorScheme="blackAlpha" />
 
           <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={onClose}
-              textColor="#eee"
-            >
+            <Button colorScheme="blue" mr={3} onClick={onClose} textColor="#eee">
               Create
             </Button>
           </ModalFooter>
