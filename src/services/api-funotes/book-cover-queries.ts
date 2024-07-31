@@ -9,8 +9,9 @@ class BookCoverQueries {
 
   async getBookCovers(): Promise<any> {
     try {
-      const response = await axiosInstance.get(`${this.base_url}`);
-      console.log('response', response);
+      console.log("this.base_url: ", "book-cover");
+      const response = await axiosInstance.get(`book-cover`);
+      console.log("response", response);
 
       return response.data;
     } catch (error) {
@@ -22,3 +23,8 @@ class BookCoverQueries {
 const bookCoverQueries = new BookCoverQueries();
 
 export { bookCoverQueries };
+
+/* 
+  convertir a programacion funcional sin herencias ni clases ya que a react-query
+  no parecen gustarle las clases. (investigar el tema)
+*/

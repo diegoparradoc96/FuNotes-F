@@ -2,9 +2,13 @@
 import React, { useState } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
 import styled from "styled-components";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 /* containers */
 import { NotebookContainer_, NotebookCreator_, Header_ } from "../containers";
+
+// Create a client
+const queryClient = new QueryClient();
 
 export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
@@ -30,6 +34,8 @@ export default function Home() {
   };
 
   return (
+    <QueryClientProvider client={queryClient}>
+
     <ChakraProvider>
       <main
         className="flex flex-col h-screen select-none w-full"
@@ -53,6 +59,8 @@ export default function Home() {
         </Firstbox_>
       </main>
     </ChakraProvider>
+    </QueryClientProvider>
+
   );
 }
 

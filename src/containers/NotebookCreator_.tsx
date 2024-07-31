@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-
+/* react query */
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
 /* icons */
 import { MdAdd } from "react-icons/md";
 /* chakra */
@@ -130,6 +131,9 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
 export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Access the client
+  const queryClient = useQueryClient();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [coversFixed, setCoversFixed] = useState<any[]>([]);
@@ -137,10 +141,14 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   const [selectedCover, setSelectedCover] = useState<string>("");
 
   useEffect(() => {
-    setCovers([]);
-    loadCoversFixed();
+    //setCovers([]);
+    //loadCoversFixed();
     loadCovers();
   }, []);
+
+  const bookCovers = useQuery("bookCovers", bookCoverQueries.getBookCovers);
+
+  console.log("bookCovers: ", bookCovers);
 
   const loadCoversFixed = async () => {
     try {
@@ -150,26 +158,21 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
       console.error("error en loadCoversFixed front: ", error);
     }
   };
-
   const loadCovers = () => {
     console.log("En desarrollo");
   };
-
   const toggleCoverFixed = (cover: string) => {
     setSelectedCover(cover);
   };
-
   const toggleCover = (cover: string) => {
     setSelectedCover(cover);
   };
-
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
       loadCovers();
     }
   };
-
   const handleClick = () => {
     fileInputRef.current?.click();
   };
