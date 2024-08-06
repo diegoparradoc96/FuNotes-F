@@ -9,9 +9,7 @@ class BookCoverQueries {
 
   async getBookCovers(): Promise<any> {
     try {
-      console.log("this.base_url: ", "book-cover");
       const response = await axiosInstance.get(`book-cover`);
-      console.log("response", response);
 
       return response.data;
     } catch (error) {

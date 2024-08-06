@@ -2,21 +2,19 @@
 
 import React, { useState } from "react";
 import styled from "styled-components";
-
 /* chakra ui */
 import { Image, Box } from "@chakra-ui/react";
 
+/* types */
+import { IBookCover } from "../common/types";
+
 interface CoverFixedProps {
-  cover_fixed: string;
+  cover_fixed: IBookCover;
   selectedCover: string;
   toggleCoverFixed: (cover: string) => void;
 }
 
-const CoverFixed_: React.FC<CoverFixedProps> = ({
-  cover_fixed,
-  toggleCoverFixed,
-  selectedCover,
-}) => {
+const CoverFixed_: React.FC<CoverFixedProps> = ({ cover_fixed, selectedCover, toggleCoverFixed }) => {
   return (
     <Box
       w={"100%"}
@@ -25,23 +23,25 @@ const CoverFixed_: React.FC<CoverFixedProps> = ({
       borderRadius={10}
       cursor="pointer"
       onClick={() => {
-        toggleCoverFixed(cover_fixed);
+        toggleCoverFixed(cover_fixed.url_cover);
       }}
       display="flex"
       justifyContent="center"
       alignItems="center"
       position="relative"
     >
-      <div
-        className="absolute mt-1"
-        style={cover_fixed == selectedCover ? { zIndex: 1 } : {}}
-      >
+      <div className="absolute mt-1" style={cover_fixed.url_cover == selectedCover ? { zIndex: 1 } : {}}>
         <CheckIconWrapper>
           <CheckMark />
         </CheckIconWrapper>
       </div>
 
-      <Image h={"100%"} src={cover_fixed} style={{ zIndex: 0 }} />
+      <Image
+        h={"100%"}
+        src={cover_fixed.url_cover}
+        alt={cover_fixed.id_cover?.toString()}
+        style={{ zIndex: 0 }}
+      />
     </Box>
   );
 };

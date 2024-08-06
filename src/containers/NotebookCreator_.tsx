@@ -29,24 +29,16 @@ import { covers_fixed } from "@/utils";
 /* components */
 import { CoverFixed_, Cover_ } from "@/components";
 /* services */
-import { bookCoverQueries } from "../services/api-funotes";
+import { bookCoverQueries, bookQueries } from "../services/api-funotes";
+/* types */
+import { IBookCover } from "../common/types";
 
 interface IconButtonProps_ {
   onOpen: () => void;
 }
 interface NotebookCreatorProps {}
 interface ConverContainerProps {
-  covers_fixed: {
-    cover1: string;
-    cover2: string;
-    cover3: string;
-    cover4: string;
-    cover5: string;
-    cover6: string;
-    cover7: string;
-    cover8: string;
-    cover9: string;
-  };
+  covers_fixed: IBookCover[] | undefined;
   covers: string[];
   toggleCoverFixed: (cover: string) => void;
   toggleCover: (cover: string) => void;
@@ -86,6 +78,25 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
   toggleCover,
   selectedCover,
 }) => {
+  const renderCovers = () => {
+    if (!covers_fixed) {
+      return <p className="text-black">No hay cubiertas que mostrar</p>;
+    } else {
+      return Object.values(covers_fixed).map((cover, index) => (
+        <GridItem key={index} minW={59} minH={77}>
+          <CoverFixed_
+            cover_fixed={cover}
+            toggleCoverFixed={toggleCoverFixed}
+            selectedCover={selectedCover}
+          />
+        </GridItem>
+        // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
+        //   <Image h={"100%"} src={cover} />
+        // </Box>
+      ));
+    }
+  };
+
   return (
     <Grid
       templateColumns="repeat(5, 1fr)"
@@ -111,19 +122,7 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
           <Cover_ cover={cover} toggleCover={toggleCover} selectedCover={selectedCover} />
         </GridItem>
       ))}
-
-      {Object.values(covers_fixed).map((cover, index) => (
-        <GridItem key={index} minW={59} minH={77}>
-          <CoverFixed_
-            cover_fixed={cover}
-            toggleCoverFixed={toggleCoverFixed}
-            selectedCover={selectedCover}
-          />
-        </GridItem>
-        // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
-        //   <Image h={"100%"} src={cover} />
-        // </Box>
-      ))}
+      {renderCovers()}
     </Grid>
   );
 };
@@ -146,9 +145,10 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
     loadCovers();
   }, []);
 
-  const bookCovers = useQuery("bookCovers", bookCoverQueries.getBookCovers);
-
-  console.log("bookCovers: ", bookCovers);
+  const { data, error, isLoading } = useQuery<IBookCover[], Error>(
+    "bookCovers",
+    bookCoverQueries.getBookCovers
+  );
 
   const loadCoversFixed = async () => {
     try {
@@ -175,6 +175,14 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
   };
   const handleClick = () => {
     fileInputRef.current?.click();
+  };
+  const toggleCreateBook = async (selectedCover: string) => {
+    try {
+      // voy aqui
+      const response = await bookQueries.post();
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   return (
@@ -231,7 +239,7 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
 
               <Container p={0} mt={4} w="80%">
                 <CoverContainer_
-                  covers_fixed={covers_fixed}
+                  covers_fixed={data}
                   covers={covers}
                   toggleCoverFixed={toggleCoverFixed}
                   toggleCover={toggleCover}
@@ -244,7 +252,12 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
           <Divider colorScheme="blackAlpha" />
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose} textColor="#eee">
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => toggleCreateBook(selectedCover)}
+              textColor="#eee"
+            >
               Create
             </Button>
           </ModalFooter>
