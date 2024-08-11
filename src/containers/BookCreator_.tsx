@@ -24,25 +24,20 @@ import {
   IconButton,
   Container,
 } from "@chakra-ui/react";
-/* cover-fixed */
-import { covers_fixed } from "@/utils";
 /* components */
-import { CoverFixed_, Cover_ } from "@/components";
+import { Cover_ } from "@/components";
 /* services */
 import { bookCoverQueries, bookQueries } from "../services/api-funotes";
 /* types */
-import { IBookCover } from "../common/types";
+import { IBookCover, IBook, IPostBook } from "../common/types";
 
 interface IconButtonProps_ {
   onOpen: () => void;
 }
-interface NotebookCreatorProps {}
 interface ConverContainerProps {
-  covers_fixed: IBookCover[] | undefined;
-  covers: string[];
-  toggleCoverFixed: (cover: string) => void;
-  toggleCover: (cover: string) => void;
-  selectedCover: string;
+  bookCovers: IBookCover[] | undefined;
+  toggleBookCover: (cover: IBookCover) => void;
+  selectedBookCover?: IBookCover;
 }
 
 const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
@@ -72,27 +67,22 @@ const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
 };
 
 const CoverContainer_: React.FC<ConverContainerProps> = ({
-  covers_fixed,
-  covers,
-  toggleCoverFixed,
-  toggleCover,
-  selectedCover,
+  bookCovers,
+  toggleBookCover,
+  selectedBookCover,
 }) => {
   const renderCovers = () => {
-    if (!covers_fixed) {
+    if (!bookCovers) {
       return <p className="text-black">No hay cubiertas que mostrar</p>;
     } else {
-      return Object.values(covers_fixed).map((cover, index) => (
+      return Object.values(bookCovers).map((bookCover, index) => (
         <GridItem key={index} minW={59} minH={77}>
-          <CoverFixed_
-            cover_fixed={cover}
-            toggleCoverFixed={toggleCoverFixed}
-            selectedCover={selectedCover}
+          <Cover_
+            bookCover={bookCover}
+            toggleCover={toggleBookCover}
+            selectedCover={selectedBookCover}
           />
         </GridItem>
-        // <Box w={70} h={85} overflow="hidden" borderRadius={10} key={index}>
-        //   <Image h={"100%"} src={cover} />
-        // </Box>
       ));
     }
   };
@@ -117,71 +107,65 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
         },
       }}
     >
-      {covers.map((cover, index) => (
-        <GridItem key={index} minW={59} minH={77} maxH={77}>
-          <Cover_ cover={cover} toggleCover={toggleCover} selectedCover={selectedCover} />
-        </GridItem>
-      ))}
       {renderCovers()}
     </Grid>
   );
 };
 
-export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
+export const NotebookCreator_: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Access the client
-  const queryClient = useQueryClient();
-
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [coversFixed, setCoversFixed] = useState<any[]>([]);
-  const [covers, setCovers] = useState<string[]>([]);
-  const [selectedCover, setSelectedCover] = useState<string>("");
-
-  useEffect(() => {
-    //setCovers([]);
-    //loadCoversFixed();
-    loadCovers();
-  }, []);
+  const queryClient = useQueryClient();
 
   const { data, error, isLoading } = useQuery<IBookCover[], Error>(
     "bookCovers",
     bookCoverQueries.getBookCovers
   );
 
-  const loadCoversFixed = async () => {
-    try {
-      const coversFixedScope = await bookCoverQueries.getBookCovers();
-      console.log("cubiertas de libros: ", coversFixedScope);
-    } catch (error) {
-      console.error("error en loadCoversFixed front: ", error);
-    }
-  };
-  const loadCovers = () => {
-    console.log("En desarrollo");
-  };
-  const toggleCoverFixed = (cover: string) => {
-    setSelectedCover(cover);
-  };
-  const toggleCover = (cover: string) => {
-    setSelectedCover(cover);
+  const [selectedBookCover, setSelectedBookCover] = useState<IBookCover>();
+  const [value, setValue] = useState<string>("");
+
+  useEffect(() => {}, []);
+
+  const postBook = useMutation(bookQueries.post, {
+    onSuccess: () => {
+      // Invalida y refetch los queries que se relacionan con esta mutación
+      queryClient.invalidateQueries("books");
+    },
+  });
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value);
+  const toggleBookCover = (bookCover: IBookCover) => {
+    setSelectedBookCover(bookCover);
   };
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
-      loadCovers();
     }
   };
   const handleClick = () => {
     fileInputRef.current?.click();
   };
-  const toggleCreateBook = async (selectedCover: string) => {
+  const toggleCreateBook = async (): Promise<void> => {
+    if (!selectedBookCover || !value || value.trim().length < 1) {
+      alert("da un nombre a tu libro y selecciona una cubiera para el");
+    } else {
+      const succesCreateBook = await createBook(value, selectedBookCover);
+      succesCreateBook ? onClose() : null;
+    }
+  };
+  const createBook = async (name_book: string, bookCover: IBookCover): Promise<boolean> => {
+    const newData = {
+      name_book,
+      id_cover: bookCover.id_cover,
+    };
+
     try {
-      // voy aqui
-      const response = await bookQueries.post();
+      await postBook.mutateAsync(newData);
+      return true;
     } catch (error) {
-      console.log("error", error);
+      console.log("error: ", error);
+      return false;
     }
   };
 
@@ -206,6 +190,8 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
               </Text>
 
               <Input
+                value={value}
+                onChange={handleChange}
                 w="80%"
                 variant="unstyled"
                 background="#eee"
@@ -239,11 +225,9 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
 
               <Container p={0} mt={4} w="80%">
                 <CoverContainer_
-                  covers_fixed={data}
-                  covers={covers}
-                  toggleCoverFixed={toggleCoverFixed}
-                  toggleCover={toggleCover}
-                  selectedCover={selectedCover}
+                  bookCovers={data}
+                  toggleBookCover={toggleBookCover}
+                  selectedBookCover={selectedBookCover}
                 />
               </Container>
             </Container>
@@ -255,8 +239,9 @@ export const NotebookCreator_: React.FC<NotebookCreatorProps> = ({}) => {
             <Button
               colorScheme="blue"
               mr={3}
-              onClick={() => toggleCreateBook(selectedCover)}
+              onClick={() => toggleCreateBook()}
               textColor="#eee"
+              isDisabled={!value || !selectedBookCover ? true : false}
             >
               Create
             </Button>

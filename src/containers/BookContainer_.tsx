@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 /* chakra */
 import {
   Box,
@@ -15,12 +14,21 @@ import {
 } from "@chakra-ui/react";
 /* icons */
 import { MdAdd } from "react-icons/md";
+/* react query */
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
+
 /* components */
-import { Notebook_ } from "../components/Notebook_";
-/* container */
-import { NotebookCreator_ } from "../containers";
+import { Book_ } from "../components/Book_";
+/* containers */
+import { NotebookCreator_ } from ".";
+/* services */
+import { bookQueries } from "../services/api-funotes";
+/* types */
+import { IBook } from "../common/types";
 
 export const NotebookContainer_ = () => {
+  const { data, error, isLoading } = useQuery<IBook[], Error>("books", bookQueries.getAll);
+
   return (
     <Accordion defaultIndex={[0]} allowToggle reduceMotion>
       <AccordionItem>
@@ -38,8 +46,10 @@ export const NotebookContainer_ = () => {
           <NotebookCreator_ />
         </Flex>
 
-        <AccordionPanel padding={0} >
-          <Notebook_ />
+        <AccordionPanel padding={0}>
+          {data?.map((book) => (
+            <Book_ book={book} key={book.id_book} />
+          ))}
         </AccordionPanel>
       </AccordionItem>
     </Accordion>

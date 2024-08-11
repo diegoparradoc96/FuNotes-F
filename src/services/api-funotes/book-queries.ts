@@ -1,15 +1,13 @@
 import { axiosInstance } from "../axios/axios-instance";
 
+import { IBook, IPostBook } from "../../common/types";
+
 class BookQueries {
-  private base_url: string;
+  constructor() {}
 
-  constructor() {
-    this.base_url = "book";
-  }
-
-  async get(): Promise<any> {
+  async getAll(): Promise<any> {
     try {
-      const response = await axiosInstance.get(`${this.base_url}`);
+      const response = await axiosInstance.get(`book`);
 
       return response.data;
     } catch (error) {
@@ -17,9 +15,10 @@ class BookQueries {
     }
   }
 
-  async post(): Promise<any> {
+  async post(newData: IPostBook): Promise<any> {
     try {
-      const response = await axiosInstance.post(`book`)
+      const response = await axiosInstance.post(`book`, newData);
+      return response;
     } catch (error) {
       throw error;
     }

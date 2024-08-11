@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 
 /* containers */
 import { NotebookContainer_, NotebookCreator_, Header_ } from "../containers";
+/* context */
+import { MainContainerProvider } from "../context";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -35,32 +37,32 @@ export default function Home() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ChakraProvider>
+        <MainContainerProvider>
+          <main
+            className="flex flex-col h-screen select-none w-full"
+            onMouseMove={handleBorderDrag}
+            onMouseUp={handleBorderDragEnd}
+          >
+            <div className="h-16">
+              <Header_ />
+            </div>
 
-    <ChakraProvider>
-      <main
-        className="flex flex-col h-screen select-none w-full"
-        onMouseMove={handleBorderDrag}
-        onMouseUp={handleBorderDragEnd}
-      >
-        <div className="h-16">
-          <Header_ />
-        </div>
-
-        <Firstbox_
-          className="h-full"
-          style={{
-            width: `${firstBoxWidth}px`,
-            minWidth: 150,
-            maxWidth: 700,
-          }}
-        >
-          <NotebookContainer_ />
-          <Border_ onMouseDown={handleBorderDragStart} />
-        </Firstbox_>
-      </main>
-    </ChakraProvider>
+            <Firstbox_
+              className="h-full"
+              style={{
+                width: `${firstBoxWidth}px`,
+                minWidth: 150,
+                maxWidth: 700,
+              }}
+            >
+              <NotebookContainer_ />
+              <Border_ onMouseDown={handleBorderDragStart} />
+            </Firstbox_>
+          </main>
+        </MainContainerProvider>
+      </ChakraProvider>
     </QueryClientProvider>
-
   );
 }
 
@@ -80,4 +82,3 @@ const Border_ = styled.div`
     cursor: ew-resize;
   }
 `;
-

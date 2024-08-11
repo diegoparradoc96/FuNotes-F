@@ -1,2 +1,2 @@
-export * from "./CoverFixed_";
-export * from "./Cover_";
+export * from "./BookCover_";
+export * from "./Book_"
