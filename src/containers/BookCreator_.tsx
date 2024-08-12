@@ -26,7 +26,7 @@ import {
 } from "@chakra-ui/react";
 /* components */
 import { Cover_ } from "@/components";
-/* services */
+/* queries */
 import { bookCoverQueries, bookQueries } from "../services/api-funotes";
 /* types */
 import { IBookCover, IBook, IPostBook } from "../common/types";
@@ -121,18 +121,17 @@ export const NotebookCreator_: React.FC = () => {
     "bookCovers",
     bookCoverQueries.getBookCovers
   );
+  const postBook = useMutation(bookQueries.post, {
+    onSuccess: () => {
+      // Invalida y refetch los queries que se relacionan con esta mutación
+      queryClient.invalidateQueries("book");
+    },
+  });
 
   const [selectedBookCover, setSelectedBookCover] = useState<IBookCover>();
   const [value, setValue] = useState<string>("");
 
   useEffect(() => {}, []);
-
-  const postBook = useMutation(bookQueries.post, {
-    onSuccess: () => {
-      // Invalida y refetch los queries que se relacionan con esta mutación
-      queryClient.invalidateQueries("books");
-    },
-  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value);
   const toggleBookCover = (bookCover: IBookCover) => {

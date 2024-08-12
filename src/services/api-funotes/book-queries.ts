@@ -23,6 +23,15 @@ class BookQueries {
       throw error;
     }
   }
+
+  async delete(book: IBook): Promise<any> {
+    try {
+      const response = await axiosInstance.delete(`book/${book.id_book}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 const bookQueries = new BookQueries();

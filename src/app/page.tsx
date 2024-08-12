@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { ChakraProvider } from "@chakra-ui/react";
 import styled from "styled-components";
 import { QueryClient, QueryClientProvider } from "react-query";
+/* chakra UI */
+import { ChakraProvider, Divider } from "@chakra-ui/react";
 
 /* containers */
-import { NotebookContainer_, NotebookCreator_, Header_ } from "../containers";
+import { BookContainer_, NotebookCreator_, Toolbar_ } from "../containers";
 /* context */
 import { MainContainerProvider } from "../context";
 
@@ -23,11 +24,9 @@ export default function Home() {
     setStartX(e.clientX);
     setStartWidth(e.target.offsetWidth);
   };
-
   const handleBorderDragEnd = () => {
     setIsDragging(false);
   };
-
   const handleBorderDrag = (e: any) => {
     if (!isDragging) return;
     const movementX = e.clientX - startX;
@@ -38,29 +37,27 @@ export default function Home() {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
-        <MainContainerProvider>
-          <main
-            className="flex flex-col h-screen select-none w-full"
-            onMouseMove={handleBorderDrag}
-            onMouseUp={handleBorderDragEnd}
-          >
-            <div className="h-16">
-              <Header_ />
-            </div>
+        <main
+          className="flex flex-col h-screen select-none w-full"
+          onMouseMove={handleBorderDrag}
+          onMouseUp={handleBorderDragEnd}
+        >
+          <Toolbar_ />
 
-            <Firstbox_
-              className="h-full"
-              style={{
-                width: `${firstBoxWidth}px`,
-                minWidth: 150,
-                maxWidth: 700,
-              }}
-            >
-              <NotebookContainer_ />
-              <Border_ onMouseDown={handleBorderDragStart} />
-            </Firstbox_>
-          </main>
-        </MainContainerProvider>
+          <Divider />
+
+          <Firstbox_
+            className="h-full"
+            style={{
+              width: `${firstBoxWidth}px`,
+              minWidth: 150,
+              maxWidth: 700,
+            }}
+          >
+            <BookContainer_ />
+            <Border_ onMouseDown={handleBorderDragStart} />
+          </Firstbox_>
+        </main>
       </ChakraProvider>
     </QueryClientProvider>
   );

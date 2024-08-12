@@ -2,14 +2,11 @@
 
 import React, { useState } from "react";
 import { Text, Box, Image, Menu, MenuButton, MenuList, MenuItem, Divider } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreHoriz } from "react-icons/md";
 
 /* types */
 import { IBook } from "../common/types";
-
-interface BookProps {
-  book: IBook;
-}
 
 const fontSize = 11;
 const background = "#333439";
@@ -17,7 +14,12 @@ const hoverBackground = "#595B5A";
 const textColor = "white";
 const paddingX = 5;
 
-export const Book_: React.FC<BookProps> = ({ book }) => {
+interface BookProps {
+  book: IBook;
+  toggleDeleteBook: (book: IBook) => void;
+}
+
+export const Book_: React.FC<BookProps> = ({ book, toggleDeleteBook }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
 
@@ -70,7 +72,10 @@ export const Book_: React.FC<BookProps> = ({ book }) => {
             </MenuItem>
             <Divider size="4px" marginTop={2} marginBottom={2} w={160} />
             <MenuItem
-              onClick={() => toggleMenuItem()}
+              onClick={() => {
+                toggleMenuItem();
+                toggleDeleteBook(book);
+              }}
               fontSize={fontSize}
               textColor={textColor}
               _hover={{ background: hoverBackground }}
