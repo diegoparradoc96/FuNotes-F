@@ -4,13 +4,14 @@ import React, { useState, useEffect, useRef } from "react";
 /* react query */
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
 /* icons */
-import { MdOutlineSettings } from "react-icons/md";
+import { MdOutlineSettings, MdBrightness6, MdOutlinePerson } from "react-icons/md";
 /* chakra */
 import {
   Button,
   GridItem,
   Text,
   Input,
+  Tabs,
   Grid,
   useDisclosure,
   Divider,
@@ -22,6 +23,11 @@ import {
   ModalFooter,
   Tooltip,
   IconButton,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Box,
   Container,
   Center,
 } from "@chakra-ui/react";
@@ -49,24 +55,51 @@ export const Settings_: React.FC = () => {
         <ModalOverlay />
 
         <ModalContent className="select-none" minH={500}>
-          <ModalBody px={1} py={0} className="flex">
-            <Container
-              flex="0 0 30%"
-              height={"auto"}
-              paddingTop={2}
-              borderRight="1px solid"
-              borderRightColor="#ccc"
-            >
-              <Text alignContent="center" fontWeight="bold" fontSize={15} textColor="#424242">
-                SETTINGS
-              </Text>
-            </Container>
+          <ModalBody px={0} py={0} className="flex">
+            <Tabs orientation="vertical" variant="unstyled">
+              <Box display="flex" height={500}>
+                <TabList
+                  minW={150}
+                  borderRight="1px"
+                  borderColor="gray.200"
+                  mr={4} // Margin right
+                >
+                  <Box pt={4} mb={4} fontWeight="bold">
+                    <Text as="span" pl={5} fontSize={13} textColor={"#6D6D6D"}>
+                      SETTINGS
+                    </Text>
+                  </Box>
 
-            <Container flex="0 0 70%" height={16} paddingTop={2}>
-              <Text alignContent="center" fontWeight="bold" fontSize={14} textColor="#424242">
-                My content
-              </Text>
-            </Container>
+                  <Tab
+                    _selected={{ bg: "#eee", fontWeight: "bold" }}
+                    _hover={{ bg: "#eee" }}
+                    justifyContent={"left"}
+                    fontSize={12}
+                  >
+                    <MdOutlinePerson size={22} color="#0BD34E" />
+                    <Text ml={3}>My Acount</Text>
+                  </Tab>
+                  <Tab
+                    _selected={{ bg: "#eee", fontWeight: "bold" }}
+                    _hover={{ bg: "#eee" }}
+                    justifyContent={"left"}
+                    fontSize={12}
+                  >
+                    <MdBrightness6 size={22} color="#8979B8" />
+                    <Text ml={3}>Themes</Text>
+                  </Tab>
+                </TabList>
+
+                <TabPanels>
+                  <TabPanel>
+                    <p>En desarrollo...</p>
+                  </TabPanel>
+                  <TabPanel>
+                    <p>Light - Dark</p>
+                  </TabPanel>
+                </TabPanels>
+              </Box>
+            </Tabs>
           </ModalBody>
 
           {/* <ModalFooter></ModalFooter> */}
