@@ -21,6 +21,7 @@ import {
   TabPanel,
   Box,
   Button,
+  useColorMode,
 } from "@chakra-ui/react";
 /* components */
 import { Cover_ } from "@/components";
@@ -31,18 +32,129 @@ import { IBookCover, IBook, IPostBook, ISystemMode } from "../common/types";
 import styled from "styled-components";
 
 export const Settings_: React.FC = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [systemMode, setSystemMode] = useState<ISystemMode>("light");
 
   const toggleLightMode = () => {
-    setSystemMode("light");
+    if (colorMode != "light") toggleColorMode();
   };
   const toggleDarkMode = () => {
-    setSystemMode("dark");
+    if (colorMode != "dark") toggleColorMode();
+  };
+  const renderDarkModeImage = () => {
+    interface StarProps {
+      top: string;
+      left?: string;
+      right?: string;
+    }
+    interface TreeProps {
+      left: string;
+      height?: string;
+    }
+
+    const Scene = styled.div`
+      width: 300px;
+      height: 180px;
+      background-color: #2D3748;
+      position: relative;
+      overflow: hidden;
+    `;
+    const Sky = styled.div`
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70%;
+    `;
+    const Moon = styled.div`
+      width: 30px;
+      height: 30px;
+      background-color: #ecf0f1;
+      border-radius: 50%;
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    `;
+    const Star = styled.div<StarProps>`
+      width: 2px;
+      height: 2px;
+      background-color: #ecf0f1;
+      position: absolute;
+      top: ${(props) => props.top};
+      ${(props) => (props.left ? `left: ${props.left};` : `right: ${props.right};`)}
+    `;
+    const Ground = styled.div`
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30%;
+    `;
+    const Tree = styled.div<TreeProps>`
+      width: 20px;
+      height: ${(props) => props.height || "40px"};
+      background-color: #27ae60;
+      border-radius: 50% 50% 0 0;
+      position: absolute;
+      bottom: 0;
+      left: ${(props) => props.left};
+    `;
+    const Window = styled.div`
+      width: 120px;
+      height: 80px;
+      background-color: #34495e;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 5px;
+    `;
+    const Bar = styled.div`
+      height: 20px;
+      background-color: #2c3e50;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    `;
+    const Content = styled.div`
+      padding: 10px;
+    `;
+    const Line = styled.div`
+      height: 8px;
+      background-color: #7f8c8d;
+      margin-bottom: 5px;
+      border-radius: 2px;
+
+      &:last-child {
+        width: 60%;
+      }
+    `;
+
+    return (
+      <Scene>
+        <Sky>
+          <Moon></Moon>
+          <Star top="40px" left="50px" />
+          <Star top="60px" right="80px" />
+        </Sky>
+        <Ground>
+          <Tree left="30px" />
+          <Tree left="60px" height="30px" />
+        </Ground>
+        <Window>
+          <Bar></Bar>
+          <Content>
+            <Line></Line>
+            <Line></Line>
+            <Line></Line>
+          </Content>
+        </Window>
+      </Scene>
+    );
   };
   const renderSystemModeImage = () => {
-    if (systemMode == "light") {
+    if (colorMode == "light") {
       return (
         <>
           <Container>
@@ -62,7 +174,7 @@ export const Settings_: React.FC = () => {
         </>
       );
     } else {
-      return <p>Imagen de modo dark</p>;
+      return renderDarkModeImage();
     }
   };
   return (
@@ -156,7 +268,6 @@ const Container = styled.div`
   position: relative;
   width: 300px;
   height: 180px;
-  
 `;
 
 const Laptop = styled.div`
