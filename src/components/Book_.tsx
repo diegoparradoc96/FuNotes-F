@@ -1,12 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { Text, Box, Image, Menu, MenuButton, MenuList, MenuItem, Divider } from "@chakra-ui/react";
+import {
+  Text,
+  Box,
+  Image,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Divider,
+  useColorMode,
+} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreHoriz } from "react-icons/md";
 
 /* types */
 import { IBook } from "../common/types";
+/* colors */
+import { darkColors } from "../utils";
 
 const fontSize = 11;
 const background = "#333439";
@@ -20,6 +32,8 @@ interface BookProps {
 }
 
 export const Book_: React.FC<BookProps> = ({ book, toggleDeleteBook }) => {
+  const { colorMode } = useColorMode();
+
   const [isOpen, setIsOpen] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
 
@@ -30,12 +44,14 @@ export const Book_: React.FC<BookProps> = ({ book, toggleDeleteBook }) => {
 
   return (
     <Box
-      textColor="black"
+      textColor={colorMode == "light" ? "black" : darkColors.text}
       height={10}
       w="100%"
       display="flex"
       alignItems="center"
-      _hover={{ bg: "#F6F6F6" }}
+      _hover={{
+        bg: colorMode == "light" ? "#F6F6F6" : "#3D4756",
+      }}
       cursor="pointer"
       rounded={5}
       onMouseEnter={() => setShowIcon(true)}

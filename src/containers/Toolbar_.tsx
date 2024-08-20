@@ -1,4 +1,6 @@
 import React from "react";
+/* chakra ui */
+import { ChakraProvider, Divider, useColorMode } from "@chakra-ui/react";
 
 /* chakra UI */
 import { IconButton, Box } from "@chakra-ui/react";
@@ -9,8 +11,17 @@ import { MdMoreHoriz, MdOutlineSettings } from "react-icons/md";
 import { Settings_ } from "../containers";
 
 const Toolbar_: React.FC = () => {
+  const { colorMode } = useColorMode();
+  /* 
+  backgroundColor={colorMode == "light" ? "#eee" : "#000"} />
+  */
   return (
-    <Box display="flex" justifyContent="flex-end">
+    <Box
+      display="flex"
+      justifyContent="flex-end"
+      borderWidth={1}
+      borderBottomColor={colorMode == "light" ? "#eee" : "#000"}      
+    >
       <Settings_ />
       {/* <IconButton
         width={16}

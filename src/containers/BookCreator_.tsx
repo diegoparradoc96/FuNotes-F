@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 /* react query */
-import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 /* icons */
 import { MdAdd } from "react-icons/md";
 /* chakra */
@@ -20,16 +20,20 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Box,
   Tooltip,
   IconButton,
   Container,
+  useColorMode,
 } from "@chakra-ui/react";
 /* components */
 import { Cover_ } from "@/components";
 /* queries */
 import { bookCoverQueries, bookQueries } from "../services/api-funotes";
 /* types */
-import { IBookCover, IBook, IPostBook } from "../common/types";
+import { IBookCover } from "../common/types";
+/* colors */
+import { colorsBookCreator, mainColors } from "../utils";
 
 interface IconButtonProps_ {
   onOpen: () => void;
@@ -41,6 +45,8 @@ interface ConverContainerProps {
 }
 
 const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
+  const { colorMode } = useColorMode();
+
   const [show, setShow] = useState(false);
 
   return (
@@ -49,7 +55,16 @@ const IconButton_: React.FC<IconButtonProps_> = ({ onOpen }) => {
       label="New Notebook"
       placement="top"
       hasArrow
-      bg="#424242"
+      bg={
+        colorMode == "light"
+          ? colorsBookCreator.bg_tooltip_button_light
+          : colorsBookCreator.bg_tooltip_button_dark
+      }
+      textColor={
+        colorMode == "light"
+          ? colorsBookCreator.bg_tooltip_text_light
+          : colorsBookCreator.bg_tooltip_text_dark
+      }
       paddingX={5}
       paddingY={2}
       rounded={5}
@@ -113,6 +128,8 @@ const CoverContainer_: React.FC<ConverContainerProps> = ({
 };
 
 export const NotebookCreator_: React.FC = () => {
+  const { colorMode } = useColorMode();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
@@ -169,22 +186,35 @@ export const NotebookCreator_: React.FC = () => {
   };
 
   return (
-    <>
+    <Box>
       <IconButton_ onOpen={onOpen} />
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
         <ModalOverlay />
 
-        <ModalContent className="select-none">
-          <ModalHeader textColor="black" textAlign="center" mt={2}>
-            <Text textColor="#424242" fontSize={16}>
+        <ModalContent
+          className="select-none"
+          bgColor={colorMode == "light" ? colorsBookCreator.bg_light : colorsBookCreator.bg_dark}
+        >
+          <ModalHeader textAlign="center" mt={2}>
+            <Text
+              textColor={colorMode == "light" ? colorsBookCreator.text_light : mainColors.text_dark}
+              fontSize={16}
+            >
               Create New Notebook
             </Text>
           </ModalHeader>
 
           <ModalBody p={1}>
             <Container px={10} display="flex">
-              <Text w="20%" alignContent="center" fontWeight="bold" fontSize={14} textColor="#424242">
+              <Text
+                w="20%"
+                alignContent="center"
+                fontSize={14}
+                textColor={
+                  colorMode == "light" ? colorsBookCreator.text_light : colorsBookCreator.text_dark
+                }
+              >
                 Name
               </Text>
 
@@ -194,15 +224,31 @@ export const NotebookCreator_: React.FC = () => {
                 w="80%"
                 variant="unstyled"
                 background="#eee"
-                fontSize={14}
+                fontSize={13}
                 px={5}
                 py={2}
                 placeholder="Enter notebook name"
+                bgColor={
+                  colorMode == "light"
+                    ? colorsBookCreator.bg_input_light
+                    : colorsBookCreator.bg_input_dark
+                }
+                textColor={
+                  colorMode == "light"
+                    ? colorsBookCreator.text_input_light
+                    : colorsBookCreator.text_input_dark
+                }
               />
             </Container>
 
             <Container mt={10} pl={10} pr={0} display="flex">
-              <Text w="20%" fontWeight="bold" textColor="#424242" fontSize={14}>
+              <Text
+                w="20%"
+                fontSize={14}
+                textColor={
+                  colorMode == "light" ? colorsBookCreator.text_light : colorsBookCreator.text_dark
+                }
+              >
                 Cover
                 <Input
                   type="file"
@@ -236,10 +282,21 @@ export const NotebookCreator_: React.FC = () => {
 
           <ModalFooter>
             <Button
-              colorScheme="blue"
+              bgColor={!value || !selectedBookCover ? "grey" : colorsBookCreator.bg_button_dark}
+              _hover={
+                !value || !selectedBookCover
+                  ? { backgroundColor: "none" }
+                  : colorMode == "light"
+                  ? { backgroundColor: colorsBookCreator.bg_hover_button_light }
+                  : { backgroundColor: colorsBookCreator.bg_hover_button_dark }
+              }
               mr={3}
               onClick={() => toggleCreateBook()}
-              textColor="#eee"
+              textColor="#fff"
+              fontWeight={"none"}
+              fontSize={13}
+              w={82}
+              h={33}
               isDisabled={!value || !selectedBookCover ? true : false}
             >
               Create
@@ -247,6 +304,6 @@ export const NotebookCreator_: React.FC = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </Box>
   );
 };

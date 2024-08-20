@@ -11,6 +11,7 @@ import {
   AccordionIcon,
   AccordionPanel,
   Flex,
+  useColorMode,
 } from "@chakra-ui/react";
 /* react query */
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -23,9 +24,12 @@ import { NotebookCreator_ } from ".";
 import { bookQueries } from "../services/api-funotes";
 /* types */
 import { IBook } from "../common/types";
+/* colors */
+import { mainColors } from "../utils";
 
 export const BookContainer_: React.FC = () => {
   const queryClient = useQueryClient();
+  const { colorMode } = useColorMode();
 
   const { data, error, isLoading } = useQuery<IBook[], Error>("book", bookQueries.getAll);
 
@@ -47,8 +51,8 @@ export const BookContainer_: React.FC = () => {
   };
 
   return (
-    <Accordion defaultIndex={[0]} allowToggle reduceMotion style={{borderTop: "white"}}>
-      <AccordionItem>
+    <Accordion defaultIndex={[0]} allowToggle reduceMotion style={{ borderTop: "transparent" }}>
+      <AccordionItem border={"none"}> 
         <Flex alignItems="center">
           <AccordionButton>
             <AccordionIcon color="#aaa" fontSize={24} />
