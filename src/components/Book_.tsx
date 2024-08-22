@@ -12,7 +12,6 @@ import {
   Divider,
   useColorMode,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreHoriz } from "react-icons/md";
 
 /* types */
@@ -21,8 +20,8 @@ import { IBook } from "../common/types";
 import { darkColors } from "../utils";
 
 const fontSize = 11;
-const background = "#333439";
-const hoverBackground = "#595B5A";
+const background = "#1E1F20";
+const hoverBackground = "#2D2E31";
 const textColor = "white";
 const paddingX = 5;
 
@@ -50,16 +49,24 @@ export const Book_: React.FC<BookProps> = ({ book, toggleDeleteBook }) => {
       display="flex"
       alignItems="center"
       _hover={{
-        bg: colorMode == "light" ? "#F6F6F6" : "#3D4756",
+        bg: !isOpen && (colorMode == "light" ? "#F6F6F6" : "#2D2E31"),
       }}
       cursor="pointer"
       rounded={5}
-      onMouseEnter={() => setShowIcon(true)}
-      onMouseLeave={() => setShowIcon(false)}
+      onMouseEnter={() => !isOpen && setShowIcon(true)}
+      onMouseLeave={() => {
+        setShowIcon(false);
+        !isOpen && setShowIcon(false);
+      }}
     >
       {/* 🟥 portada y nombre del libro 🟥 */}
       <Box w="95%" ml="40px" display="flex" alignItems="center">
-        <Image src={book.bookcover?.url_cover} boxSize="22px" height="27px" borderRadius="3px" />
+        <Image
+          src={book.bookcover?.url_cover}
+          boxSize="22px"
+          height="27px"
+          borderRadius="3px"
+        />
         <Text ml={2} noOfLines={1} fontSize={13}>
           {book.name_book}
         </Text>
@@ -67,14 +74,30 @@ export const Book_: React.FC<BookProps> = ({ book, toggleDeleteBook }) => {
 
       {/* 🟥 menu de opciones 🟥 */}
       <Box w="15px" mr="15px">
-        <Menu isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <Menu
+          isOpen={isOpen}
+          onClose={() => {
+            setShowIcon(false);
+            setIsOpen(false);
+          }}
+        >
           {showIcon && (
-            <MenuButton display="flex" alignItems="center" onClick={() => setIsOpen(true)}>
+            <MenuButton
+              display="flex"
+              alignItems="center"
+              onClick={() => setIsOpen(true)}
+            >
               <MdMoreHoriz size={20} color="#aaa" />
             </MenuButton>
           )}
 
-          <MenuList background={background} onMouseLeave={() => setShowIcon(false)} minW={163} w={160}>
+          <MenuList
+            background={background}
+            onMouseLeave={() => setShowIcon(false)}
+            minW={160}
+            w={160}
+            border={"none"}
+          >
             <MenuItem
               onClick={() => toggleMenuItem()}
               fontSize={fontSize}

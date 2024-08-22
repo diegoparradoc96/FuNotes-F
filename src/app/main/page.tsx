@@ -4,10 +4,10 @@ import React, { useState } from "react";
 /* styled */
 import styled from "styled-components";
 /* chakra ui */
-import { ChakraProvider, Divider, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@chakra-ui/react";
 
 /* containers */
-import { BookContainer_, NotebookCreator_, Toolbar_ } from "../../containers";
+import { BookContainer_, Toolbar_ } from "../../containers";
 /* colors */
 import { mainColors } from "../../utils";
 
@@ -40,11 +40,12 @@ const Main: React.FC = () => {
       className="flex flex-col h-screen select-none w-full"
       onMouseMove={handleBorderDrag}
       onMouseUp={handleBorderDragEnd}
-      style={{ backgroundColor: colorMode == "light" ? mainColors.bg_light : mainColors.bg_dark }}
+      style={{
+        backgroundColor:
+          colorMode == "light" ? mainColors.bg_light : mainColors.bg_dark,
+      }}
     >
       <Toolbar_ />
-
-      {/* <Divider backgroundColor={colorMode == "light" ? "#eee" : "#000"} /> */}
 
       <Firstbox_
         className="h-full"
